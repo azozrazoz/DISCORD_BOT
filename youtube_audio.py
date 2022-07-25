@@ -1,102 +1,10 @@
-# -*- coding: utf-8 -*-
 import asyncio
-
 import discord
 import youtube_dl
-import os
-from discord.utils import get
-from discord import FFmpegPCMAudio
-from os import system
+
 from discord.ext import commands
-from config import TOKEN, PREFIX
-from pyfiglet import Figlet
 
-
-server, server_id, name_channel = None, None, None
-
-intents = discord.Intents.default()
-intents.members = True
-
-bot = commands.Bot(command_prefix=PREFIX, intents=intents)
-
-players = {}
-
-# @bot.event
-# async def on_message(ctx):
-#     if ctx.content == 'exit':
-#         bot.close()
-#     elif ctx.author != bot.user:
-#         await ctx.reply(ctx.content)
-
-
-# user = await bot.fetch_user(ctx.message.author.id)
-# я не знаю зачем, но думаю эта сточка мне потом понадобится
-
-
-@bot.event
-async def on_ready():
-    # лучше используйте standard он вроде норм с таким текстом 'B o t  o n l i n e'
-    # smisome1 еще вот этот шрифт прикольный
-    text = Figlet(font='speed')
-    print(text.renderText('Bot online'))
-
-
-@bot.command(name="test")
-async def test(ctx):
-    print(ctx)
-
-
-# просто тестовая функция на то что в ботом все ок
-@bot.command(name="foo")
-async def foo(ctx, *, arg=None):
-    if arg is None:
-        await ctx.send('ну хоть что нибудь напиши, просто так не зови :\\')
-    else:
-        # 0x означает # то есть это HEX color, например 0x070365 = #070365, 0xcfbdf4 = #cfbdf4
-        await ctx.send(embed=discord.Embed(description=arg, color=0xcfbdf4))
-
-
-@bot.command(name="join", pass_context=True)
-async def join(ctx):
-    channel = ctx.author.voice.channel
-    voice = get(bot.voice_clients, guild=ctx.guild)
-
-    if voice and voice.is_connected():
-        await voice.move_to(channel)
-    else:
-        await channel.connect()
-        print(f"The bot has connected to {channel}\n")
-
-    await ctx.send(f"Joined {channel}")
-
-
-# @bot.command(name="play", pass_context=True)
-# async def play(ctx, *, query):
-#     player = Music(bot)
-#     await player.play(ctx=ctx, query=query)
-#     # async with ctx.typing():
-#     #     player = await youtube_audio.YTDLSource.from_url(query, loop=bot.loop, stream=True)
-#     #     ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
-#     #
-#     # await ctx.send(f'Now playing: {player.title}')
-
-
-@bot.command(name="leave")
-async def leave(ctx):
-    try:
-        channel = ctx.message.author.voice.channel
-    except AttributeError:
-        await ctx.send(f'{ctx.author.mention} чел тыы сам не гс сидишь')
-        return
-
-    voice = get(bot.voice_clients, guild=ctx.guild)
-    if voice and voice.is_connected():
-        await voice.disconnect()
-        await ctx.send(f"Left {channel}")
-    else:
-        await ctx.send(f"{ctx.author.mention} ты думал я в гс? а нееет")
-
-
+# Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ''
 
 
@@ -165,7 +73,7 @@ class Music(commands.Cog):
 
         await ctx.send(f'Now playing: {query}')
 
-    @bot.command(name="play")
+    @commands.command()
     async def yt(self, ctx, *, url):
         """Plays from a url (almost anything youtube_dl supports)"""
 
@@ -213,11 +121,3 @@ class Music(commands.Cog):
                 raise commands.CommandError("Author not connected to a voice channel.")
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
-
-
-def main():
-    bot.run(TOKEN)
-
-
-if __name__ == '__main__':
-    main()
