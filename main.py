@@ -9,6 +9,7 @@ from discord.ext import commands
 from config import TOKEN, PREFIX
 from music_cog import MusicCog
 from help_cog import HelpCog
+from additional_cog import IpCog, ManageMsgCog
 
 server, server_id, name_channel = None, None, None
 
@@ -20,6 +21,8 @@ bot.remove_command('help')
 bot.remove_cog('help')
 bot.add_cog(MusicCog(bot))
 bot.add_cog(HelpCog(bot))
+bot.add_cog(IpCog(bot))
+bot.add_cog(ManageMsgCog(bot))
 
 
 # вот это то что ниже не включайте оно пока не работает)
