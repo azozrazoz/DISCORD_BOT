@@ -9,8 +9,8 @@ class HelpCog(commands.Cog):
 ```html
 Основные команды:
 %help - (то что ты сейчас видишь) показывает набор команд
-%play or #p [url on youtube link] - воспроизводит шедевры
-%queue or #q - выводит список текущей музыки
+%play or %p [url on youtube link or name of song] - воспроизводит шедевры
+%queue or %q - выводит список текущей музыки
 %clear - очищащет текущий список 
 %skip - это делает Шамиль когда играет в доту
 %leave - и это тоже
