@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
 import discord
 from discord.ext import commands
-from config import TOKEN, PREFIX
+from config import TOKEN
 from my_music_cog import MusicCog
 from help_cog import HelpCog
 from additional_cog import IpCog, ManageMsgCog
 from test_cog import TestCog
 
-server, server_id, name_channel = None, None, None
+# скрипт который поддерживает бота в сети (он вроде так работает)
+
+# from keep_alive import keep_alive
+#
+# keep_alive()
+
+PREFIX = '%'
 
 intents = discord.Intents.default()
 intents.members = True
