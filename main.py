@@ -2,7 +2,7 @@
 import discord
 from discord.ext import commands
 from config import TOKEN
-from my_music_cog import MusicCog
+from music_cog import MusicCog
 from help_cog import HelpCog
 from additional_cog import IpCog, ManageMsgCog
 from test_cog import TestCog
