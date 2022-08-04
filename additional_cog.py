@@ -1,5 +1,6 @@
 from discord.ext import commands
 import socket
+import random
 
 
 class ManageMsgCog(commands.Cog):
@@ -38,3 +39,15 @@ class IpCog(commands.Cog):
         else:
             self.url = args
             await ctx.send(self.get_ip_by_host())
+
+
+class GetRandomCog(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.command(name="rnd")
+    async def get_random(self, ctx, *args):
+        try:
+            await ctx.send(f"Ваше число: {random.randint(int(args[0]), int(args[1]))}")
+        except (ValueError, TypeError, IndexError):
+            await ctx.send("Введи нормальный диапазон плз :<")

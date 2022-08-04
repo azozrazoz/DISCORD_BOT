@@ -4,7 +4,7 @@ from discord.ext import commands
 from config import TOKEN
 from music_cog import MusicCog
 from help_cog import HelpCog
-from additional_cog import IpCog, ManageMsgCog
+from additional_cog import IpCog, ManageMsgCog, GetRandomCog
 from test_cog import TestCog
 
 # скрипт который поддерживает бота в сети (он вроде так работает)
@@ -26,10 +26,12 @@ bot.add_cog(HelpCog(bot))
 bot.add_cog(IpCog(bot))
 bot.add_cog(ManageMsgCog(bot))
 bot.add_cog(TestCog(bot))
+bot.add_cog(GetRandomCog(bot))
 
 
 def main():
     bot.run(TOKEN)
+    # if bot.guilds.id == 23838:
 
 
 if __name__ == '__main__':

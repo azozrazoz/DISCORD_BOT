@@ -21,6 +21,7 @@ class YTDLError(Exception):
     pass
 
 
+# Работа с ютубом и поиск песни на нем
 class YTDLSource(discord.PCMVolumeTransformer):
     YTDL_OPTIONS = {
         'format': 'bestaudio/best',
@@ -151,6 +152,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         return ', '.join(duration)
 
 
+# Создание вложения для визуала
 class Song:
     __slots__ = ('source', 'requester')
 
@@ -176,7 +178,10 @@ class Song:
         return embed
 
 
+# Работа со списком песен
 class SongQueue(asyncio.Queue):
+    _queue = []
+
     def __getitem__(self, item):
         if isinstance(item, slice):
             return list(
@@ -212,7 +217,7 @@ class VoiceState:
         self.songs = SongQueue()
 
         self._loop = False
-        self._volume = 0.5
+        self._volume = 1.0
         self.skip_votes = set()
 
         self.audio_player = bot.loop.create_task(self.audio_player_task())
@@ -280,6 +285,7 @@ class VoiceState:
 
         if self.voice:
             await self.voice.disconnect()
+            self.current = None
             self.voice = None
 
 
@@ -315,7 +321,7 @@ class MusicCog(commands.Cog):
         await ctx.send('An error occurred: {}'.format(str(error)))
 
     @commands.command(name='join', aliases=['j'], invoke_without_subcommand=True)
-    async def _join(self, ctx: commands.Context):
+    async def _join(self, ctx):
         """Joins a voice channel."""
         try:
             destination = ctx.author.voice.channel
@@ -332,7 +338,7 @@ class MusicCog(commands.Cog):
     @commands.command(name='summon', aliases=['s'])
     @commands.has_permissions(manage_guild=True)
     async def _summon(self,
-                      ctx: commands.Context,
+                      ctx,
                       *,
                       channel: discord.VoiceChannel = None):
         """Summons the bot to a voice channel.
@@ -354,7 +360,7 @@ class MusicCog(commands.Cog):
 
     @commands.command(name='leave', aliases=['disconnect'])
     @commands.has_permissions(manage_guild=True)
-    async def _leave(self, ctx: commands.Context):
+    async def _leave(self, ctx):
         """Clears the queue and leaves the voice channel."""
 
         if not ctx.voice_state.voice:
@@ -365,7 +371,7 @@ class MusicCog(commands.Cog):
         del self.voice_states[ctx.guild.id]
 
     @commands.command(name='volume', aliases=['v'])
-    async def _volume(self, ctx: commands.Context, *, volume: int):
+    async def _volume(self, ctx, *, volume: int):
         """Sets the volume of the player."""
 
         if not ctx.voice_state.is_playing:
@@ -378,51 +384,60 @@ class MusicCog(commands.Cog):
         await ctx.send('Звук установлен на {}%'.format(volume))
 
     @commands.command(name='now', aliases=['current', 'playing'])
-    async def _now(self, ctx: commands.Context):
+    async def _now(self, ctx):
         """Displays the currently playing song."""
 
-        await ctx.send(embed=ctx.voice_state.current.create_embed())
+        try:
+            await ctx.send(embed=ctx.voice_state.current.create_embed())
+        except AttributeError:
+            return await ctx.send('Пока что ничего не играет :|')
 
     @commands.command(name='pause')
     @commands.has_permissions(manage_guild=True)
-    async def _pause(self, ctx: commands.Context):
+    async def _pause(self, ctx):
         """Pauses the currently playing song."""
 
         if ctx.voice_state.is_playing and ctx.voice_state.voice.is_playing():
             ctx.voice_state.voice.pause()
-            await ctx.send(f"{ctx.author.mention} ваша остановочка!")
             await ctx.message.add_reaction('⏯')
+            await ctx.send(f"{ctx.author.mention} ваша остановочка!")
 
     @commands.command(name='resume')
     @commands.has_permissions(manage_guild=True)
-    async def _resume(self, ctx: commands.Context):
+    async def _resume(self, ctx):
         """Resumes a currently paused song."""
 
         if ctx.voice_state.is_playing and ctx.voice_state.voice.is_paused():
             ctx.voice_state.voice.resume()
-            await ctx.send(f"{ctx.author.mention} балдеееж!")
             await ctx.message.add_reaction('⏯')
+            await ctx.send(f"{ctx.author.mention} балдеееж!")
 
     @commands.command(name='stop')
     @commands.has_permissions(manage_guild=True)
-    async def _stop(self, ctx: commands.Context):
+    async def _stop(self, ctx):
         """Stops playing song and clears the queue."""
 
         ctx.voice_state.songs.clear()
+        # print(ctx.voice_state.current)
 
         if ctx.voice_state.is_playing:
             ctx.voice_state.voice.stop()
-            await ctx.send(f"{ctx.author.mention} ваша остановочка!")
+            await ctx.voice_state.stop()
             await ctx.message.add_reaction('⏹')
+            await ctx.send(f"{ctx.author.mention} ваша полная остановочка!")
 
     @commands.command(name='skip')
-    async def _skip(self, ctx: commands.Context):
+    async def _skip(self, ctx):
         """Vote to skip a song. The requester can automatically skip.
         3 skip votes are needed for the song to be skipped.
         """
 
         if not ctx.voice_state.is_playing:
             return await ctx.send('Пока что ничего не играет :|')
+
+        if not ctx.author.voice or not ctx.author.voice.channel:
+            await ctx.send(f'{ctx.author.mention} чел тыы, сам не в гс :/')
+            return
 
         voter = ctx.message.author
         if voter == ctx.voice_state.current.requester:
@@ -432,7 +447,7 @@ class MusicCog(commands.Cog):
         elif voter.id not in ctx.voice_state.skip_votes:
             ctx.voice_state.skip_votes.add(voter.id)
             total_votes = len(ctx.voice_state.skip_votes)
-            total_members = len(ctx.author.voice.channel.voice_states)
+            total_members = len(ctx.author.voice.channel.voice_states) - 1
 
             if total_votes >= total_members:
                 await ctx.message.add_reaction('⏭')
@@ -444,7 +459,7 @@ class MusicCog(commands.Cog):
             await ctx.send('Ты уже голосовал -^-')
 
     @commands.command(name='queue', aliases=['q'])
-    async def _queue(self, ctx: commands.Context, *, page: int = 1):
+    async def _queue(self, ctx, *, page: int = 1):
         """Shows the player's queue.
 
         You can optionally specify the page to show. Each page contains 10 elements.
@@ -471,7 +486,7 @@ class MusicCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name='shuffle')
-    async def _shuffle(self, ctx: commands.Context):
+    async def _shuffle(self, ctx):
         """Shuffles the queue."""
 
         if len(ctx.voice_state.songs) == 0:
@@ -481,18 +496,18 @@ class MusicCog(commands.Cog):
         await ctx.message.add_reaction('✅')
 
     @commands.command(name='remove')
-    async def _remove(self, ctx: commands.Context, index: int):
+    async def _remove(self, ctx, index: int):
         """Removes a song from the queue at a given index."""
 
         if len(ctx.voice_state.songs) == 0:
             return await ctx.send('Бак пуст, плз залей 92 :)')
 
         ctx.voice_state.songs.remove(index - 1)
-        await ctx.message.add_reaction('Ты кто такой? Давай до свидания!')
+        await ctx.send('Один трек покинул нас')
         await ctx.message.add_reaction('✅')
 
     @commands.command(name='loop', aliases=['l'])
-    async def _loop(self, ctx: commands.Context):
+    async def _loop(self, ctx):
         """Loops the currently playing song.
 
         Invoke this command again to unloop the song.
@@ -504,14 +519,14 @@ class MusicCog(commands.Cog):
         # Inverse boolean value to loop and unloop.
         ctx.voice_state.loop = not ctx.voice_state.loop
         if ctx.voice_state.loop:
-            await ctx.message.add_reaction('Будет сделано!')
             await ctx.message.add_reaction('✅')
+            await ctx.send('Будет сделано!')
         else:
-            await ctx.message.add_reaction('Будет сделано, но в другую сторону')
             await ctx.message.add_reaction('✅')
+            await ctx.send('Будет сделано, но в другую сторону')
 
-    @commands.command(name='play')
-    async def _play(self, ctx: commands.Context, *, search: str):
+    @commands.command(name='play', aliases=['p', 'play_now'])
+    async def _play(self, ctx, *, search: str):
         """Plays a song.
 
         If there are songs in the queue, this will be queued until the
@@ -531,22 +546,19 @@ class MusicCog(commands.Cog):
                                                         loop=self.bot.loop)
             except YTDLError as e:
                 await ctx.send(
-                    'An error occurred while processing this request: {}'.
-                    format(str(e)))
+                    'An error occurred while processing this request: {}'.format(str(e)))
             else:
                 song = Song(source)
 
                 await ctx.voice_state.songs.put(song)
-                await ctx.send('Enqueued {}'.format(str(source)))
+                await ctx.send('Добавлено: {}'.format(str(source)))
 
     @_join.before_invoke
     @_play.before_invoke
     async def ensure_voice_state(self, ctx: commands.Context):
         if not ctx.author.voice or not ctx.author.voice.channel:
-            raise commands.CommandError(
-                'You are not connected to any voice channel.')
+            await ctx.send(f'{ctx.author.mention} чел тыы, сам не в гс :/')
 
         if ctx.voice_client:
             if ctx.voice_client.channel != ctx.author.voice.channel:
-                raise commands.CommandError(
-                    'Bot is already in a voice channel.')
+                await ctx.send(f'{ctx.author.mention} сам меня пригласил, сам же и свалил :(')

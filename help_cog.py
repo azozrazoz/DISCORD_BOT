@@ -5,24 +5,8 @@ from pyfiglet import Figlet
 class HelpCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.help_message = """
-```html
-Основные команды:
-%help - (то что ты сейчас видишь) показывает набор команд
-%play or %p [url on youtube link or name of song] - воспроизводит шедевры
-%queue or %q - выводит список текущей музыки
-%clear - очищащет текущий список 
-%skip - это делает Шамиль когда играет в доту
-%leave - и это тоже
-%join - просто подключает бота к каналу
-%pause - останавливает музыку
-%resume - отпускает паузу
-
-Доп. команды:
-%foo - может выводить ваше сообщение в виде вложения
-%test - проверка 
-```
-"""
+        with open("Help_desc.txt", "r", encoding='utf-8') as file_help:
+            self.help_message = file_help.read()
         self.text_channel_list = []
 
     # some debug info so that we know the bot has started

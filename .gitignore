@@ -130,6 +130,9 @@ dmypy.json
 
 config.py
 config
-
+VisualElements
+.VisualElements
 .idea
 idea
+main_run.bat
+Text Document.txt
