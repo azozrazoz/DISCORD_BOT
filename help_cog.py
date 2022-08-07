@@ -5,7 +5,7 @@ from pyfiglet import Figlet
 class HelpCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        with open("Help_desc.txt", "r", encoding='utf-8') as file_help:
+        with open("help_desc.txt", "r", encoding='utf-8') as file_help:
             self.help_message = file_help.read()
         self.text_channel_list = []
 
