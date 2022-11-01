@@ -22,7 +22,7 @@ bot.add_cog(GetRandomCog(bot))
 
 
 def main():
-    with open("_config.txt", 'r', encoding='utf-8') as f:
+    with open("config.txt", 'r', encoding='utf-8') as f:
         bot.run(f.readline())
 
 

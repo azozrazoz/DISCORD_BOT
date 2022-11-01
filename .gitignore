@@ -146,3 +146,4 @@ deploy
 /deploy
 deploy/_config.txt
 /deploy/
+config.txt
