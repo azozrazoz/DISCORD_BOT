@@ -8,7 +8,7 @@ from pyfiglet import Figlet
 class HelpCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.JSON_FILE = str(os.path.dirname(os.path.realpath(__file__))) + '\\data.json'
+        self.JSON_FILE = str(os.path.dirname(os.path.realpath(__file__))) + '/data.json'
         self.data = self.get_data_from_json_file()
 
         with open("help_desc.txt", "r", encoding='utf-8') as file_help:

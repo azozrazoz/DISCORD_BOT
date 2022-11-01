@@ -13,12 +13,12 @@ class ManageMsgCog(commands.Cog):
         try:
             amount = int(count) + 1
             if amount < 1:
-                await ctx.send('как я тебе это сделаю? :\\')
+                await ctx.send('Как я тебе это сделаю? :\\')
             else:
                 await ctx.channel.purge(limit=amount)
                 print(f'Was deleted {count} messages!')
         except Exception as ex:
-            await ctx.send(f'как я тебе это сделаю? :\\ {ex}')
+            await ctx.send(f'Как я тебе это сделаю? :\\ {ex}')
 
 
 class IpCog(commands.Cog):
@@ -59,7 +59,7 @@ class IpCog(commands.Cog):
     @commands.command(name="curl")
     async def get_ip(self, ctx, *, args=None):
         if args is None:
-            await ctx.send('сюда нужно обязательный url или domain :\\')
+            await ctx.send('Сюда нужно обязательный url или domain :\\')
         else:
             self.url = args
             await ctx.send(self.get_ip_by_host() + "\n" + self.get_info_by_ip())
@@ -67,7 +67,7 @@ class IpCog(commands.Cog):
     @commands.command(name="pip")
     async def get_ip(self, ctx, *, args=None):
         if args is None:
-            await ctx.send('сюда нужно обязательный ip address :\\')
+            await ctx.send('Сюда нужно обязательный ip address :\\')
         else:
             self.ip = args
             await ctx.send(self.get_info_by_ip())

@@ -8,13 +8,13 @@ class TestCog(commands.Cog):
 
     @commands.command(name="test")
     async def test(self, ctx):
-        await ctx.send(f'дарова {ctx.message.author.name}!')
+        await ctx.send(f'Дарова {ctx.message.author.name}!')
 
     # просто тестовая функция на то что в ботом все ок
     @commands.command(name="foo")
     async def foo(self, ctx, *, arg=None):
         if arg is None:
-            await ctx.send('ну хоть что нибудь напиши, просто так не зови :\\')
+            await ctx.send('Ну хоть что нибудь напиши, просто так не зови :\\')
         else:
             # 0x означает # то есть это HEX color, например 0x070365 = #070365, 0xcfbdf4 = #cfbdf4
             await ctx.send(embed=discord.Embed(description=arg, color=0xcfbdf4))

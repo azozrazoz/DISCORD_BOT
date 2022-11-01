@@ -325,7 +325,7 @@ class MusicCog(commands.Cog):
     @commands.command(name='queue', aliases=['q'])
     async def _queue(self, ctx):
         if len(self.queue) <= 0:
-            await ctx.send("бак пуст :(")
+            await ctx.send("Бак пуст :(")
             return
 
         retval = ""
@@ -357,7 +357,7 @@ class MusicCog(commands.Cog):
             return await ctx.send(f"{ctx.author.mention} ты думал я в гс? а нееет")
 
         self.voice_channel.stop()
-        await ctx.send(f"я пошел, бывайте :3 {str(ctx.author.voice.channel)[1:]}")
+        await ctx.send(f"Я пошел, бывайте :3 {str(ctx.author.voice.channel)[1:]}")
         await self.voice_channel.disconnect()
         self.voice_channel = None
         self.is_playing = False
