@@ -2,6 +2,10 @@ import discord
 from discord.ext import commands
 
 
+async def setup(bot):
+    await bot.add_cog(TestCog(bot))
+
+
 class TestCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot

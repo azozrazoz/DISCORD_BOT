@@ -7,6 +7,10 @@ import youtube_dl
 # from youtube_dl import YoutubeDL
 
 
+async def setup(bot):
+    await bot.add_cog(MusicCog(bot))
+
+
 class YTDLError(Exception):
     pass
 

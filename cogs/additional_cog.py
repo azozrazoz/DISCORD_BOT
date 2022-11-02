@@ -4,6 +4,12 @@ import random
 import requests
 
 
+async def setup(bot):
+    await bot.add_cog(ManageMsgCog(bot))
+    await bot.add_cog(IpCog(bot))
+    await bot.add_cog(GetRandomCog(bot))
+
+
 class ManageMsgCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot

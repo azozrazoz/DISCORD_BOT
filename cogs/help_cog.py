@@ -5,13 +5,17 @@ from discord.ext import commands
 from pyfiglet import Figlet
 
 
+async def setup(bot):
+    await bot.add_cog(HelpCog(bot))
+
+
 class HelpCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.JSON_FILE = str(os.path.dirname(os.path.realpath(__file__))) + '/data.json'
         self.data = self.get_data_from_json_file()
 
-        with open("help_desc.txt", "r", encoding='utf-8') as file_help:
+        with open("/home/azozrazoz/PycharmProjects/MUSIC_BOT/DISCORD_BOT/cogs/help_desc.txt", "r", encoding='utf-8') as file_help:
             self.help_message = file_help.read()
 
         self.text_channel_list = []

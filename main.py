@@ -1,30 +1,29 @@
+import asyncio
+import os
 import discord
 from discord.ext import commands
-from music_cog import MusicCog
-from help_cog import HelpCog
-from additional_cog import IpCog, ManageMsgCog, GetRandomCog
-from test_cog import TestCog
 
 PREFIX = '%'
 
 intents = discord.Intents.default()
 intents.members = True
+intents.message_content = True
 bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
-bot.remove_command('help')
-bot.remove_cog('help')
-bot.add_cog(MusicCog(bot))
-bot.add_cog(HelpCog(bot))
-bot.add_cog(IpCog(bot))
-bot.add_cog(ManageMsgCog(bot))
-bot.add_cog(TestCog(bot))
-bot.add_cog(GetRandomCog(bot))
+
+async def load_cogs():
+    bot.remove_command('help')
+    await bot.remove_cog('help')
+    for file in os.listdir('cogs'):
+        if file.endswith('.py'):
+            await bot.load_extension(f"cogs.{file[:-3]}")
 
 
-def main():
+async def main():
+    await load_cogs()
     with open("config.txt", 'r', encoding='utf-8') as f:
-        bot.run(f.readline())
+        await bot.start(f.readline())
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
